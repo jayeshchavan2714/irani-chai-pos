@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#2b2b2b"/>
+      <stop offset="100%" stop-color="#000000"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Circle background -->
+  <circle cx="250" cy="250" r="240" fill="url(#bg)" stroke="#c49a6c" stroke-width="8"/>
+
+  <!-- Bun -->
+  <ellipse cx="250" cy="180" rx="110" ry="60" fill="#d8a45b"/>
+  <ellipse cx="250" cy="170" rx="100" ry="50" fill="#e8b96b"/>
+
+  <!-- Tea glass -->
+  <rect x="300" y="190" width="50" height="80" rx="8" fill="#8b5a2b"/>
+  <rect x="305" y="195" width="40" height="50" fill="#c47a2c"/>
+
+  <!-- Steam -->
+  <path d="M320 170 q10 -20 0 -40" stroke="#ffffff" stroke-width="3" fill="none"/>
+  <path d="M335 170 q10 -20 0 -40" stroke="#ffffff" stroke-width="3" fill="none"/>
+
+  <!-- Text -->
+  <text x="250" y="300" text-anchor="middle" fill="#ffffff" font-size="40" font-weight="bold">IRANI</text>
+  <text x="250" y="340" text-anchor="middle" fill="#c49a6c" font-size="30">BUN MASKA</text>
+  <text x="250" y="380" text-anchor="middle" fill="#ffffff" font-size="22">POINT</text>
+</svg>
