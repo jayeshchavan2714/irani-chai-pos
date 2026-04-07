@@ -1,5 +1,9 @@
 import { useState } from "react";
 import { menu } from "./data/menu";
+import EscPosEncoder from "esc-pos-encoder";
+
+let bluetoothDevice = null;
+let characteristic = null;
 
 function App() {
   const [cart, setCart] = useState([]);
@@ -58,7 +62,7 @@ function App() {
     return token;
   };
 
-  const handlePrint = () => {
+  const handlePrint = async () => {
     if (cart.length === 0) return;
 
     const token = getNextToken();
@@ -70,33 +74,78 @@ function App() {
       time: new Date().toLocaleString(),
     };
 
-    const receipt = formatReceipt(orderData);
+    const lines = formatReceiptLines(orderData);
 
-    console.log(receipt);
-
-    alert(receipt);
+    await printReceipt(lines);
 
     setCart([]);
   };
 
-  const formatReceipt = (data) => {
-    let text = "";
+  const formatReceiptLines = (data) => {
+    const lines = [];
 
-    text += "IRANI CHAI BUN MASKA\n";
-    text += "------------------------------\n";
-    text += `Token: ${data.token}\n`;
-    text += `Time: ${data.time}\n`;
-    text += "------------------------------\n";
+    lines.push("IRANI CHAI BUN MASKA");
+    lines.push("------------------------------");
+    lines.push(`Token: ${data.token}`);
+    lines.push(`${data.time}`);
+    lines.push("------------------------------");
 
     data.items.forEach((item) => {
-      text += `${item.name} x${item.qty} ₹${item.price * item.qty}\n`;
+      const total = item.price * item.qty;
+      lines.push(`${item.name} x${item.qty} ₹${total}`);
     });
 
-    text += "------------------------------\n";
-    text += `Total: ₹${data.total}\n`;
-    text += "------------------------------\n";
+    lines.push("------------------------------");
+    lines.push(`TOTAL: ₹${data.total}`);
+    lines.push("------------------------------");
 
-    return text;
+    return lines;
+  };
+
+  const printReceipt = async (lines) => {
+    if (!characteristic) {
+      alert("Connect printer first");
+      return;
+    }
+
+    const encoder = new EscPosEncoder();
+
+    let encoded = encoder.initialize();
+
+    lines.forEach((line, index) => {
+      if (index === 0) {
+        encoded = encoded.align("center").line(line);
+      } else {
+        encoded = encoded.align("left").line(line);
+      }
+    });
+
+    const data = encoded.cut().encode();
+
+    try {
+      await characteristic.writeValue(data);
+    } catch (err) {
+      console.error(err);
+      alert("Print failed ❌");
+    }
+  };
+
+  const connectPrinter = async () => {
+    try {
+      bluetoothDevice = await navigator.bluetooth.requestDevice({
+        acceptAllDevices: true,
+        optionalServices: [0xFFE0],
+      });
+
+      const server = await bluetoothDevice.gatt.connect();
+      const service = await server.getPrimaryService(0xFFE0);
+      characteristic = await service.getCharacteristic(0xFFE1);
+
+      alert("Printer connected ✅");
+    } catch (error) {
+      console.error(error);
+      alert("Connection failed ❌");
+    }
   };
 
   return (
@@ -237,6 +286,20 @@ function App() {
             }}
           >
             CLEAR
+          </button>
+
+          <button
+            onClick={connectPrinter}
+            style={{
+              width: "100%",
+              padding: 12,
+              marginBottom: 10,
+              background: "green",
+              color: "white",
+              borderRadius: 10,
+            }}
+          >
+            CONNECT PRINTER
           </button>
 
           <button
