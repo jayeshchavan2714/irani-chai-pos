@@ -155,6 +155,7 @@ function App() {
         height: "100vh",
         width: "100vw",
         fontFamily: "sans-serif",
+        background: "#ffffff",
       }}
     >
       {/* LEFT: MENU */}
@@ -168,8 +169,8 @@ function App() {
               style={{
                 flex: 1,
                 padding: 12,
-                background: category === cat ? "black" : "#ddd",
-                color: category === cat ? "white" : "black",
+                background: category === cat ? "#000" : "#e0e0e0",
+                color: category === cat ? "#fff" : "#000",
                 borderRadius: 10,
                 fontWeight: "bold",
               }}
@@ -193,6 +194,7 @@ function App() {
                 padding: 30,
                 fontSize: 20,
                 background: "#f5f5f5",
+                color: "#000",
                 border: "1px solid #ddd",
                 borderRadius: 12,
                 fontWeight: "bold",
