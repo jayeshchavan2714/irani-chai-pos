@@ -62,6 +62,12 @@ function App() {
     return token;
   };
 
+  const saveOrder = (order) => {
+    const existing = JSON.parse(localStorage.getItem("orders") || "[]");
+    existing.push(order);
+    localStorage.setItem("orders", JSON.stringify(existing));
+  };
+
   const handlePrint = async () => {
     if (cart.length === 0) return;
 
@@ -73,6 +79,8 @@ function App() {
       total: getTotal(),
       time: new Date().toLocaleString(),
     };
+
+    saveOrder(orderData);
 
     const lines = formatReceiptLines(orderData);
 
@@ -148,6 +156,25 @@ function App() {
     }
   };
 
+  const getTodaySales = () => {
+    const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+
+    const today = new Date().toDateString();
+
+    const todayOrders = orders.filter(
+      (o) => new Date(o.time).toDateString() === today
+    );
+
+    const total = todayOrders.reduce((sum, o) => sum + o.total, 0);
+
+    return {
+      count: todayOrders.length,
+      total,
+    };
+  };
+
+  const sales = getTodaySales();
+
   return (
     <div
       style={{
@@ -159,7 +186,7 @@ function App() {
       }}
     >
       {/* LEFT: MENU */}
-      <div style={{ flex: 1.8, padding: 15 }}>
+      <div style={{ flex: 1.8, padding: 15, background: '#ffffff' }}>
         <h2>Menu</h2>
         <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
           {["chai", "snacks", "bakery"].map((cat) => (
@@ -219,6 +246,8 @@ function App() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
+          color: '#000',
+          background: '#ffffff'
         }}
       >
         <div>
@@ -272,8 +301,14 @@ function App() {
           ))}
         </div>
 
+        
+
         {/* Bottom Section */}
         <div>
+          <div style={{ marginBottom: 10 }}>
+            <strong>Orders:</strong> {sales.count} <br />
+            <strong>Sales:</strong> ₹{sales.total}
+          </div>
           <h3>Total: ₹{getTotal()}</h3>
 
           <button
@@ -313,10 +348,29 @@ function App() {
               color: "white",
               borderRadius: 12,
               fontWeight: "bold",
+              marginBottom: 10,
             }}
             onClick={handlePrint}
           >
             PRINT TOKEN
+          </button>
+
+          <button
+            onClick={() => {
+              localStorage.removeItem("orders");
+              localStorage.removeItem("token_no");
+              alert("Day reset done");
+            }}
+            style={{
+              width: "100%",
+              padding: 10,
+              marginBottom: 10,
+              background: "red",
+              color: "white",
+              borderRadius: 10,
+            }}
+          >
+            RESET DAY
           </button>
         </div>
       </div>
